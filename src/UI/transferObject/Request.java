@@ -2,14 +2,14 @@ package UI.transferObject;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 
-/**
- * Created by DotinSchool2 on 9/13/2016.
- */
+
 public class Request implements Serializable{
+    private String terminalId;
     private String id;
     private String transactionType;
-    private String amount;
+    private BigDecimal amount;
     private String deposit;
 
     public String getId() {
@@ -20,12 +20,20 @@ public class Request implements Serializable{
         return transactionType;
     }
 
-    public Integer getAmount() {
-        return Integer.parseInt(amount);
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     public String getDeposit() {
         return deposit;
+    }
+
+    public String getTerminalId() {
+        return terminalId;
+    }
+
+    public void setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
     }
 
     static public Request convertToRequest(Object object) {
@@ -37,11 +45,18 @@ public class Request implements Serializable{
                 field.setAccessible(true);
                 Field objectField = object.getClass().getDeclaredField(fieldName);
                 objectField.setAccessible(true);
-                field.set(request, objectField.get(object));
+
+                if(field.getGenericType() == java.math.BigDecimal.class){
+                    BigDecimal bigDecimal = new BigDecimal((String)objectField.get(object));
+                    field.set(request, bigDecimal);
+                }else {
+                    field.set(request, objectField.get(object));
+                }
+
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (NoSuchFieldException e) {
-                e.printStackTrace();
+
             }
         }
         return request;

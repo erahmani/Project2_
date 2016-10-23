@@ -1,13 +1,15 @@
 package UI.transferObject;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
-/**
- * Created by DotinSchool2 on 9/13/2016.
- */
+@XmlRootElement(name = "response")
 public class Response implements Serializable{
+    @XmlAttribute(name = "terminalId")
+    private String terminalId;
     @XmlAttribute(name = "transactionId")
     private String transactionId;
     @XmlAttribute(name = "transactionType")
@@ -33,18 +35,23 @@ public class Response implements Serializable{
         this.transactionType = transactionType;
     }
 
+    public void setTerminalId(String terminalId) {
+        this.terminalId = terminalId;
+    }
 
     @Override
     public String toString() {
         Field[] fields = this.getClass().getDeclaredFields();
         String res = "\n";
-        try {
+
             for (Field field : fields) {
-                res += field.getName() + " : " + field.get(this) + "  ";
+                try {
+                    res += field.getName() + " : " + field.get(this) + "  ";
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
 
         return res;
     }

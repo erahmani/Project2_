@@ -18,6 +18,12 @@
       "id":"1",
       "initialBalance":"2,000",
       "upperBound":"10,000"
+    },
+    {
+      "customer":"r",
+      "id":"2",
+      "initialBalance":"1000",
+      "upperBound":"10,000"
     }
   ],
   "outLog":"server.out"

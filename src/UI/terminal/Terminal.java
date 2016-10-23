@@ -2,13 +2,14 @@ package UI.terminal;
 
 import BL.log.Logger;
 import DA.parse.XMLParser;
-import UI.transferObject.Requests;
-import UI.transferObject.Responses;
+import UI.transferObject.Request;
+import UI.transferObject.Response;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -61,10 +62,14 @@ public class Terminal implements Runnable {
 
     public void run() {
         // age fail shod chi?
-        sendRequestsToServer();
-        Responses responses = getResponsesFromServer();
-        writeResponseFile(responses);
-        eventLog(responses);
+        for (Transaction transaction:transactions) {
+            Request request = Request.convertToRequest(transaction);
+            request.setTerminalId(id);
+            sendRequestToServer(request);
+            Response response = getResponseFromServer();
+            writeResponseFile(response);
+            eventLog(response);
+        }
     }
 
     private void initializeTerminal() {
@@ -81,23 +86,22 @@ public class Terminal implements Runnable {
         }
     }
 
-    private void sendRequestsToServer() {
+    private void sendRequestToServer(Request request ) {
         ObjectOutputStream objectOutputStream = null;
         try {
             client = new Socket(this.server.getIp(), this.server.getPort());
             objectOutputStream = new ObjectOutputStream(client.getOutputStream());
-            Requests requests = new Requests(this.id,(List)this.transactions);
-            objectOutputStream.writeObject(requests);
+            objectOutputStream.writeObject(request);
         } catch (IOException e) {
             System.out.println(e);
         }
     }
 
-    private Responses getResponsesFromServer(){
+    private Response getResponseFromServer(){
         ObjectInputStream objectInputStream = null;
         try {
             objectInputStream = new ObjectInputStream(client.getInputStream());
-            return (Responses) objectInputStream.readObject();
+            return (Response) objectInputStream.readObject();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -107,11 +111,11 @@ public class Terminal implements Runnable {
         }
     }
 
-    private void writeResponseFile(Responses responses) {
-        new XMLParser().map(responses,responseFile);
+    private void writeResponseFile(Response response) {
+        new XMLParser().map(response,responseFile);
     }
 
-    private void eventLog(Responses responses){
-        new Logger().log(responses,outLog.getPath());
+    private void eventLog(Response response){
+        new Logger().log(response,outLog.getPath());
     }
 }
