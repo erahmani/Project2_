@@ -1,0 +1,5 @@
+<root>
+  <item name='javax.xml.transform.stream.StreamSource'>
+    <annotation name='org.jetbrains.annotations.NotNull'/>
+  </item>
+</root>
